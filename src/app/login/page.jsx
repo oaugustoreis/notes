@@ -40,12 +40,13 @@ export default function Login() {
                     scale: { type: "spring", visualDuration: 0.2, bounce: 0.2 },
                 }}>
                 <div className={`${styles.bg} p-8 rounded-lg flex flex-col items-center text-white drop-shadow-md w-80`}>
-                    <img width="48" height="48" src="https://img.icons8.com/color/48/hitfilm-pro.png" alt="hitfilm-pro" />
+                    {/* <img width="48" height="48" src="https://img.icons8.com/color/48/hitfilm-pro.png" alt="hitfilm-pro" /> */}
+                    <img width="60" height="60" src="https://img.icons8.com/papercut/60/billing.png" alt="billing"/>
                     {/* <h1 className="text-3xl font-bold">the Social</h1> */}
-                    <span className="my-3">Teste de api com react </span>
+                    <span className="my-3">Agora você saberá o que deve!</span>
                     <form onSubmit={handleSubmit} className="w-full">
                         <div className="mb-4">
-                            <label className=" text-md font-bold mb-2" htmlFor="username">Username:</label>
+                            <label className=" text-md font-bold mb-2" htmlFor="username">Email:</label>
                             <input onChange={(e) => setEmail(e.target.value)} type="text" id="username" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
                         </div>
                         <div className="mb-4">

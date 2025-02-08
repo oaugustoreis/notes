@@ -3,15 +3,28 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { motion } from "motion/react"
 import { useState } from 'react';
-export default function EditNote({ setOpenModal, id, note, setData, status }) {
-    const [editedNote, setEditedNote] = useState(note)
+import { delete_note, get_notes } from "../../utils/views";
+export default function EditNote({ setOpenModal, id, content, setData, user }) {
+    const [editedNote, setEditedNote] = useState(content)
 
     const editNote = async (id) => {
         console.log("Edited note:");
-        
+
     }
     const deleteNote = async (id) => {
-        onsole.log("deleteNote:");
+        try {
+            const res = await delete_note(user, id);
+            if (res) {
+                const response = await get_notes(user);
+                if (response) {
+                    setOpenModal(false)
+                    setData(response);
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error)
+
+        }
     }
     return (
         <motion.div
@@ -31,18 +44,7 @@ export default function EditNote({ setOpenModal, id, note, setData, status }) {
                                 <FontAwesomeIcon icon={faXmark} className='text-xl' />
                             </button>
                         </div>
-                        {/* {
-                            status ? (
-                                <div className="flex justify-start items-center">
-                                    <p className="text-sm text-gray-600">Pago</p>
-                                    <button type="button">Pagar</button>
-                                </div>
-                            ) : <div className="flex justify-start items-center">
-                                <p className="text-sm text-gray-600">Nao pago</p>
-                                <button type="button">Pagar</button>
-                            </div>
-                        } */}
-                        <textarea onChange={(e) => setEditedNote(e.target.value)} rows="3" className="text-md p-2 rounded-md w-full text-gray-900 bg-gray-100" name="description" id="description" defaultValue={note}></textarea>
+                        <textarea onChange={(e) => setEditedNote(e.target.value)} rows="3" className="text-md p-2 rounded-md w-full text-gray-900 bg-gray-100" name="description" id="description" defaultValue={content}></textarea>
 
                         <div className='flex justify-around mt-2'>
                             <button onClick={() => editNote({ id })} className="bg-green-500 p-2 px-3 rounded-full hover:bg-green-400 transition text-md text-white">Salvar</button>

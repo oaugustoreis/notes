@@ -5,15 +5,28 @@ import { faPaperPlane } from '@fortawesome/free-regular-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import Plus from './Plus'
 import { useState } from 'react'
+import { create_note, get_notes } from "../../utils/views";
 import { useRouter } from 'next/navigation'
 
-export default function CreateNote( ) {
+export default function CreateNote({ user, setData }) {
     const [open, setOpen] = useState(false)
     const [note, setNote] = useState('')
 
     const router = useRouter()
     const createNote = async () => {
-        console.log("Note created: ");
+        try {
+            const response = await create_note(note, user)
+            if (response) {
+                const res = await get_notes(user);
+                if (res) {
+                    setOpen(false)
+                    setData(res);
+                }
+            }
+        } catch (error) {
+            console.error("Error creating note:", error);
+            alert(error.message);
+        }
 
     }
     return (

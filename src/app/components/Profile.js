@@ -1,8 +1,6 @@
 "use client";
 import { motion } from "motion/react"
 import { format, set } from 'date-fns';
-import { fireStore } from "../../utils/firebase";
-import { collection, doc, getDocs, getDoc, query, where, Firestore } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare } from '@fortawesome/free-regular-svg-icons'
 import { pt } from 'date-fns/locale';
@@ -10,52 +8,35 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import EditNote from './EditNote'
 
-function ProfileCard({ user }) {
+import { get_notes } from "../../utils/views";
 
+function ProfileCard({ user, setData, data }) {
+    const [noteContent, setNoteContent] = useState([]);
+    const [noteId, setNoteId] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState(null);
     const [openModal, setOpenModal] = useState(false)
 
-    useEffect(() => {
-        console.log('user', user);
-
-        const getUser = async () => {
-            try {
-                const docRef = doc(fireStore, "notes", user);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setData(docSnap.data());
-                } else {
-                    setError("User not found.");
-                }
-            } catch (err) {
-                setError(err.message); // Set the error message
-                console.error("Error fetching user:", err); // Log the full error for debugging
-            } finally {
-                setLoading(false);
+    async function lerNotasDoUsuario() {
+        try {
+            if (!user) {
+                return;
             }
-        };
-
-        async function lerNotasDoUsuario() {
-            try {
-                const notasRef = collection(fireStore, "notes", user, "userNotes");
-                const q = query(notasRef);
-                const querySnapshot = await getDocs(q);
-                const notes = [];
-                querySnapshot.forEach((doc) => {
-                    const nota = doc.data();
-                    notes.push(nota);
-                    setData(notes);
-                });
-            } catch (error) {
-                console.error("Erro ao ler notas:", error);
-            } finally {
-                setLoading(false);
+            const res = await get_notes(user);
+            if (res) {
+                console.log('res', res);
+                
+                setData(res);
             }
+        } catch (error) {
+            console.error("Erro ao ler notas:", error);
+        } finally {
+            setLoading(false);
         }
+    }
+    useEffect(() => {
         lerNotasDoUsuario();
-    }, []);
+    }, [user]);
 
     console.log('data', data);
 
@@ -70,7 +51,10 @@ function ProfileCard({ user }) {
     if (!data) {
         return <div>User data not available.</div>;
     }
-    const editNote = async () => {
+    const editNote = async (id, content) => {
+        // console.log('editNote:', id, content);
+        setNoteContent(content)
+        setNoteId(id)
         try {
             setOpenModal(true)
         } catch (error) {
@@ -81,11 +65,11 @@ function ProfileCard({ user }) {
         <div className='text-black flex py-2 justify-center items-center flex-col h-5/6'>
             {
                 openModal && (
-                    <EditNote setOpenModal={setOpenModal} />
+                    <EditNote setData={setData} setOpenModal={setOpenModal} id={noteId} content={noteContent} user={user} />
                 )
             }
-            <div className={`flex flex-wrap  overflow-auto justify-center hide-scrollbar`}>
-                {data.map((note) => (
+            <div className="flex flex-wrap  overflow-auto justify-center hide-scrollbar">
+                {data.map((note, index) => (
                     <motion.div
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -93,13 +77,13 @@ function ProfileCard({ user }) {
                             duration: 0.2,
                             scale: { type: "spring", visualDuration: 0.2, bounce: 0.2 },
                         }}
-                        className="mx-3" key={note.id}>
+                        className="mx-3" key={index}>
                         <div className="bg-white w-60 shadow-lg my-3 rounded-lg">
                             <div className="py-2 px-4">
                                 <div className='mb-2'>
                                     <div className="flex items-center justify-between">
-                                        {/* <p className="tracking-wide text-md font-bold text-gray-700">{data.createdAt}</p> */}
-                                        <button type="button" className=" rounded-md transition hover:bg-gray-200 p-1 px-2" onClick={() => editNote()}>
+                                        <p className="tracking-wide text-md font-bold text-gray-700">@nome</p>
+                                        <button type="button" className=" rounded-md transition hover:bg-gray-200 p-1 px-2" onClick={() => editNote(note.id, note.content)}>
                                             <FontAwesomeIcon icon={faPenToSquare} className='text-xl ' />
                                         </button>
                                     </div>

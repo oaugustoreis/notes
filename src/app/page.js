@@ -9,9 +9,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import CreateNote from "./components/CreateNote";
 
 export default function Home() {
-  const [activeComponent, setActiveComponent] = useState('home');
+  const [activeComponent, setActiveComponent] = useState('profile');
   const router = useRouter();
-
+  const [data, setData] = useState([]);
   const [user, setUser] = useState(null);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -27,11 +27,9 @@ export default function Home() {
 
   const renderComponent = () => {
     switch (activeComponent) {
-      case 'home':
-        return <Homepage />;
       case 'profile':
-        return <Profile user={user }/>;
-      default:
+        return <Profile user={user} setData={setData} data={data} />;
+      case 'home':
         return <Homepage />;
     }
   };
@@ -41,8 +39,8 @@ export default function Home() {
     <div className='flex flex-col items-center justify-around h-screen'>
       {renderComponent()}
       <div className='fixed bottom-1 w-80 right-5/6'>
-        <CreateNote />
-        <NavBar setActiveComponent={setActiveComponent}  />
+        <CreateNote user={user} setData={setData} />
+        <NavBar setActiveComponent={setActiveComponent} />
       </div>
     </div>
   );
