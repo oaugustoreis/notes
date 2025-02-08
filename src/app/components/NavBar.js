@@ -36,7 +36,7 @@ function NavBar({ setActiveComponent, auth }) {
           className='flex justify-around w-full space-x-4 '
         >
           <li className='flex items-center py-1 px-3 rounded-md'>
-            <button onClick={() => setActiveComponent('home')}>Home</button>
+            <button onClick={() => setActiveComponent('home')}>Perfil</button>
           </li>
           <li className='flex items-center py-1 px-3 rounded-md'>
             <button onClick={() => setActiveComponent('profile')}>Notas</button>

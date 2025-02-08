@@ -7,12 +7,13 @@ import { pt } from 'date-fns/locale';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import EditNote from './EditNote'
-
 import { get_notes } from "../../utils/views";
+import Loading from "./Loading";
 
 function ProfileCard({ user, setData, data }) {
     const [noteContent, setNoteContent] = useState([]);
     const [noteId, setNoteId] = useState([]);
+    const [noteStatus, setNoteStatus] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false)
@@ -25,7 +26,7 @@ function ProfileCard({ user, setData, data }) {
             const res = await get_notes(user);
             if (res) {
                 console.log('res', res);
-                
+
                 setData(res);
             }
         } catch (error) {
@@ -41,7 +42,9 @@ function ProfileCard({ user, setData, data }) {
     console.log('data', data);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <Loading />
+        )
     }
 
     if (error) {
@@ -51,9 +54,10 @@ function ProfileCard({ user, setData, data }) {
     if (!data) {
         return <div>User data not available.</div>;
     }
-    const editNote = async (id, content) => {
+    const editNote = async (id, content, status) => {
         // console.log('editNote:', id, content);
         setNoteContent(content)
+        setNoteStatus(status)
         setNoteId(id)
         try {
             setOpenModal(true)
@@ -65,7 +69,7 @@ function ProfileCard({ user, setData, data }) {
         <div className='text-black flex py-2 justify-center items-center flex-col h-5/6'>
             {
                 openModal && (
-                    <EditNote setData={setData} setOpenModal={setOpenModal} id={noteId} content={noteContent} user={user} />
+                    <EditNote setData={setData} setOpenModal={setOpenModal} id={noteId} content={noteContent} status={noteStatus} user={user} />
                 )
             }
             <div className="flex flex-wrap  overflow-auto justify-center hide-scrollbar">
@@ -82,8 +86,14 @@ function ProfileCard({ user, setData, data }) {
                             <div className="py-2 px-4">
                                 <div className='mb-2'>
                                     <div className="flex items-center justify-between">
-                                        <p className="tracking-wide text-md font-bold text-gray-700">@nome</p>
-                                        <button type="button" className=" rounded-md transition hover:bg-gray-200 p-1 px-2" onClick={() => editNote(note.id, note.content)}>
+                                        {
+                                            note.status ? (
+                                                <p className="text-md px-2 py-1 rounded-md bg-green-500 font-bold text-white">Pago</p>
+                                            ) : (
+                                                <p className="text-md px-2 py-1 rounded-md bg-red-500 font-bold text-white">Pendente</p>
+                                            )
+                                        }
+                                        <button type="button" className=" rounded-md transition hover:bg-gray-200 p-1 px-2" onClick={() => editNote(note.id, note.content, note.status)}>
                                             <FontAwesomeIcon icon={faPenToSquare} className='text-xl ' />
                                         </button>
                                     </div>

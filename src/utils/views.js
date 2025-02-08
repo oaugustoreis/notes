@@ -1,6 +1,6 @@
 import { auth, fireStore } from '../utils/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, deleteDoc, collection, getDocs, query,Timestamp } from "firebase/firestore";
+import { doc, setDoc, deleteDoc,updateDoc, collection, getDocs, query, Timestamp } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 
 export async function cadastrarInfos(userId, firstName, lastName, email) {
@@ -20,29 +20,36 @@ export async function cadastrarInfos(userId, firstName, lastName, email) {
 }
 
 
-export const register = (email, password, firstName, lastName) => {
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            cadastrarInfos(user.uid, firstName, lastName, email);
-            return true;
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-        });
-}
+export const register = async (email, password, firstName, lastName) => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-export const login = (email, password) => {
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            return true;
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-        });
+        // Call the function to store additional user information
+        await cadastrarInfos(user.uid, firstName, lastName, email);
+
+        return { success: true }; // Indicate success
+    } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        // Return an object with error information
+        return { success: false, errorCode, errorMessage };
+    }
+};
+
+export const login = async (email, password) => {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log("Login successful:", user);
+        return true; // Indicate success
+    } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Login failed:", errorCode, errorMessage);
+        return false; // Indicate failure
+    }
 }
 
 export const logout = () => {
@@ -62,6 +69,7 @@ export const create_note = async (content, user) => {
     const docData = {
         data: Timestamp.fromDate(new Date()),
         content: content,
+        status: false,
         id: docRef.id
     };
     try {
@@ -76,8 +84,8 @@ export const create_note = async (content, user) => {
 }
 
 export async function get_notes(user) {
-    console.log('Usuário:', user);
-    
+    // console.log('Usuário:', user);
+
     try {
         const querySnapshot = await getDocs(query(collection(fireStore, "users", user, "userNotes")));
         const notes = [];
@@ -92,17 +100,64 @@ export async function get_notes(user) {
     }
 }
 
+export async function get_user(user) {
+    // console.log('Usuário:', user);
+
+    try {
+        const querySnapshot = await getDocs(query(collection(fireStore, "users", user, "userNotes")));
+        const notes = [];
+        querySnapshot.forEach((doc) => {
+            const nota = doc.data();
+            notes.push(nota);
+        });
+        return notes;
+    } catch (error) {
+        console.error("Erro ao ler notas:", error);
+        return false
+    }
+}
 
 export async function delete_note(user, noteId) {
     // console.log('Usuário:', user, 'ID da nota:', noteId.id);
     try {
         const docRef = doc(fireStore, "users", user, "userNotes", noteId.id);
         await deleteDoc(docRef);
-        console.log("Nota deletada com ID:", noteId);
+        // console.log("Nota deletada com ID:", noteId);
         return true;
     } catch (error) {
         console.error("Erro ao deletar nota:", error);
         alert(error.message);
+        return false;
+    }
+}
+
+export async function edit_note(user, noteId, editedNote) {
+    console.log('Usuário:', user, 'ID da nota:', noteId, 'Nota editada:', editedNote);
+    try {
+        const docRef = doc(fireStore, "users", user, "userNotes", noteId.id);
+        await setDoc(docRef, {
+            content: editedNote
+        }, { merge: true });
+        // console.log("Nota editada com ID:", noteId);
+        return true;
+    } catch (error) {
+        console.error("Erro ao editar nota:", error);
+        alert(error.message);
+        return false;
+    }
+}
+
+export async function change_status(user, noteId, status) {
+    // console.log('Usuário:', user, 'ID da nota:', noteId, 'Status:', status);
+    try {
+        const docRef = doc(fireStore, "users", user, "userNotes", noteId);
+        await updateDoc(docRef, {
+            status: !status 
+        });
+        // console.log(`Field status updated to ${status} for note ID: ${noteId}`);
+        return true;
+    } catch (error) {
+        console.error("Error updating boolean field:", error);
         return false;
     }
 }

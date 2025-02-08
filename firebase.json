@@ -1,7 +1,7 @@
 {
   "hosting": {
+    "site": "quantoeudevo",
     "public": "out",
-    "site": "oqueeudevo",
     "ignore": [
       "firebase.json",
       "**/.*",

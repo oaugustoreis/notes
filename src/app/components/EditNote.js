@@ -1,15 +1,45 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faBrazilianRealSign } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck, faTrashCan, faPaperPlane } from '@fortawesome/free-regular-svg-icons'
 import { motion } from "motion/react"
 import { useState } from 'react';
-import { delete_note, get_notes } from "../../utils/views";
-export default function EditNote({ setOpenModal, id, content, setData, user }) {
+import { delete_note, get_notes, edit_note, change_status } from "../../utils/views";
+export default function EditNote({ setOpenModal, id, content, setData, user, status }) {
     const [editedNote, setEditedNote] = useState(content)
-
+    const [payStatus, setPayStatus] = useState(status);
     const editNote = async (id) => {
-        console.log("Edited note:");
+        try {
+            const res = await edit_note(user, id, editedNote);
+            if (res) {
+                const response = await get_notes(user);
+                if (response) {
+                    setOpenModal(false)
+                    setData(response);
+                }
+            }
+        } catch (error) {
+            console.error('Error editing note:', error);
+        }
 
+    }
+    const changeStatus = async () => {
+        setPayStatus(!payStatus);
+        console.log('Status:', payStatus);
+        
+        try {
+            const res = await change_status(user, id, payStatus);
+            if (res) {
+                const response = await get_notes(user);
+                if (response) {
+                    setOpenModal(false)
+                    setData(response);
+                }
+            }
+        }
+        catch (error) {
+            console.error('Error changing status:', error)
+        }
     }
     const deleteNote = async (id) => {
         try {
@@ -47,8 +77,16 @@ export default function EditNote({ setOpenModal, id, content, setData, user }) {
                         <textarea onChange={(e) => setEditedNote(e.target.value)} rows="3" className="text-md p-2 rounded-md w-full text-gray-900 bg-gray-100" name="description" id="description" defaultValue={content}></textarea>
 
                         <div className='flex justify-around mt-2'>
-                            <button onClick={() => editNote({ id })} className="bg-green-500 p-2 px-3 rounded-full hover:bg-green-400 transition text-md text-white">Salvar</button>
-                            <button onClick={() => deleteNote({ id })} className="bg-red-500 p-2 px-3 rounded-full hover:bg-red-400 transition text-md text-white">Excluir</button>
+
+                            {
+                                payStatus ? (
+                                    <button title="Pago" onClick={changeStatus} className="drop-shadow-md font-bold  bg-green-600 p-1 px-3 rounded-full hover:bg-green-400 transition  text-md text-white"><FontAwesomeIcon icon={faCircleCheck} className='w-10' /></button>
+                                ) : (
+                                    <button title="Pagar" onClick={changeStatus} className="drop-shadow-md font-bold  bg-green-500 p-1 px-3 rounded-full hover:bg-green-400 transition text-md text-white"><FontAwesomeIcon icon={faBrazilianRealSign} className='w-10' /></button>
+                                )
+                            }
+                            <button title="Salvar alterações" onClick={() => editNote({ id })} className="drop-shadow-md font-bold  bg-indigo-500  px-3 rounded-full hover:bg-indigo-400 transition text-md text-white"><FontAwesomeIcon icon={faPaperPlane} className='w-10' /></button>
+                            <button title="Deletar nota" onClick={() => deleteNote({ id })} className="drop-shadow-md font-bold  bg-red-500  px-3 rounded-full hover:bg-red-400 transition text-md text-white"><FontAwesomeIcon icon={faTrashCan} className='w-10' /></button>
                         </div>
 
                     </div>
