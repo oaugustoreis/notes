@@ -1,31 +1,35 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./login.module.css";
 import { motion } from "motion/react"
+import { login } from '../../utils/views';
 import Link from 'next/link';
-import { login } from '../../api/api';
+import { auth } from "../../utils/firebase";
+
+import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 export default function Login() {
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const router = useRouter();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await login(username, password)
-            if (res.success) {
-                localStorage.setItem('token', res.access_token)
-                localStorage.setItem("refresh_token", res.refresh_token)
-                router.push('/')
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                router.push('/');
+                const uid = user.uid;
             }
-        }catch (err) {
-            console.log(err)
+        });
+    }, [])
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const response = login(email, password);
+        if (response) {
+            router.push('/');
         }
     }
 
-    
+
     return (
         <div className={` flex items-center justify-center h-screen`}>
             <motion.div
@@ -42,7 +46,7 @@ export default function Login() {
                     <form onSubmit={handleSubmit} className="w-full">
                         <div className="mb-4">
                             <label className=" text-md font-bold mb-2" htmlFor="username">Username:</label>
-                            <input onChange={(e) => setUsername(e.target.value)} type="text" id="username" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
+                            <input onChange={(e) => setEmail(e.target.value)} type="text" id="username" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
                         </div>
                         <div className="mb-4">
                             <label className=" text-md font-bold mb-2" htmlFor="password">Password:</label>

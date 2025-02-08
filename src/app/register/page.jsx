@@ -1,30 +1,36 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./login.module.css";
 import { motion } from "motion/react"
-import { register } from "../../api/api";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { auth } from '../../utils/firebase';
+import { register } from "../../utils/views"
 
+import { onAuthStateChanged } from "firebase/auth";
 export default function Register() {
 
-    const [username, setUsername] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                router.push('/');
+                const uid = user.uid;
+                console.log(uid);
+            }
+        });
+    }, [])
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const res = await register(username, email, password);
-            if (res) {
-                router.push("/");
-            }else{
-                throw new Error('Failed to register');
-            }
-
-        } catch (err) {
-            router.push("/register");
+        const res = register(email, password, firstName, lastName);
+        if (res) {
+            router.push("/login");
         }
 
     }
@@ -42,9 +48,15 @@ export default function Register() {
                     {/* <h1 className="text-3xl font-bold">the Social</h1> */}
                     <span className="my-3">Teste de api com react </span>
                     <form onSubmit={handleSubmit} className="w-full">
-                        <div className="mb-4">
-                            <label className=" text-md font-bold mb-2" htmlFor="username">Username:</label>
-                            <input onChange={(e) => setUsername(e.target.value)} type="text" id="username" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
+                        <div className="flex gap-2">
+                            <div className="mb-4">
+                                <label className=" text-md font-bold mb-2" htmlFor="username">Nome:</label>
+                                <input onChange={(e) => setFirstName(e.target.value)} type="text" id="firstname" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
+                            </div>
+                            <div className="mb-4">
+                                <label className=" text-md font-bold mb-2" htmlFor="username">Sobrenome:</label>
+                                <input onChange={(e) => setLastName(e.target.value)} type="text" id="lastname" name="username" className={`${styles.btn} w-full px-3 py-2 drop-shadow-md rounded-full cursor-pointer hover:bg-blue-900 focus:outline-none`} />
+                            </div>
                         </div>
                         <div className="mb-4">
                             <label className=" text-md font-bold mb-2" htmlFor="email">Email:</label>

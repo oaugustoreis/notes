@@ -2,38 +2,16 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { motion } from "motion/react"
-import { delete_note, get_notes, edit_note } from '../../api/api'
 import { useState } from 'react';
 export default function EditNote({ setOpenModal, id, note, setData, status }) {
     const [editedNote, setEditedNote] = useState(note)
 
     const editNote = async (id) => {
-        try {
-            const res = await edit_note(id, editedNote)
-            console.log(res);
-            if (res) {
-                const notes = await get_notes();
-                setData(notes);
-                setOpenModal(false)
-            }
-        } catch (error) {
-            console.error('Error editing note:', error);
-        }
+        console.log("Edited note:");
+        
     }
     const deleteNote = async (id) => {
-        console.log(id);
-        try {
-            const response = await delete_note(id)
-            if (response) {
-                const notes = await get_notes();
-                setData(notes);
-                setOpenModal(false)
-            }
-
-        }
-        catch (error) {
-            console.error('Error deleting note:', error);
-        }
+        onsole.log("deleteNote:");
     }
     return (
         <motion.div

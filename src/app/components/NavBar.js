@@ -1,32 +1,27 @@
 // import { motion } from "motion/react"
 "use client";
-import { logout } from '../../api/api';
 import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion"; // Ensure this is correct
 import { useState } from 'react';
+import { logout } from '../../utils/views';
 import Loading from './Loading';
 function NavBar({ setActiveComponent, auth }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const handleLogout = async () => {
     try {
-      const log = await logout()
-      if (log) {
-        setLoading(true)
-        localStorage.removeItem('token')
-        localStorage.removeItem('refresh_token')
+      const res = await logout()
+      if (res) {
         router.push('/login')
       }
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setLoading(false)
+    } catch (error) {
+      console.log('Error logging out user:', error)
     }
-
   }
+
   if (loading) {
     return <div className='text-black flex items-center justify-center h-screen'>
-      <Loading/>
+      <Loading />
     </div>;
   }
 
