@@ -15,11 +15,9 @@ export default function Home() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         router.push('/');
@@ -40,19 +38,19 @@ export default function Home() {
         return <Homepage user={user} />;
     }
   };
-
   return (
     <div className='flex flex-col items-center justify-around h-screen'>
       {
         loading ? <Loading /> : (
-          renderComponent()
+          <>
+            {renderComponent()}
+            <div className='fixed bottom-1 w-80 right-5/6'>
+              <CreateNote user={user} setData={setData} />
+              <NavBar setActiveComponent={setActiveComponent} />
+            </div>
+          </>
         )
       }
-
-      <div className='fixed bottom-1 w-80 right-5/6'>
-        <CreateNote user={user} setData={setData} />
-        <NavBar setActiveComponent={setActiveComponent} />
-      </div>
     </div>
   );
 }

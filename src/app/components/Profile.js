@@ -25,7 +25,7 @@ function ProfileCard({ user, setData, data }) {
             }
             const res = await get_notes(user);
             if (res) {
-                console.log('res', res);
+                // console.log('res', res);
 
                 setData(res);
             }
@@ -39,7 +39,7 @@ function ProfileCard({ user, setData, data }) {
         lerNotasDoUsuario();
     }, [user]);
 
-    console.log('data', data);
+    // console.log('data', data);
 
     if (loading) {
         return (

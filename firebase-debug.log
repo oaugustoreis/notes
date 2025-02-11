@@ -1,0 +1,16 @@
+[debug] [2025-02-11T16:53:34.667Z] ----------------------------------------------------------------------
+[debug] [2025-02-11T16:53:34.671Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ask5g\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve
+[debug] [2025-02-11T16:53:34.671Z] CLI Version:   13.30.0
+[debug] [2025-02-11T16:53:34.672Z] Platform:      win32
+[debug] [2025-02-11T16:53:34.672Z] Node Version:  v23.6.0
+[debug] [2025-02-11T16:53:34.673Z] Time:          Tue Feb 11 2025 12:53:34 GMT-0400 (Horário Padrão do Amazonas)
+[debug] [2025-02-11T16:53:34.673Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-02-11T16:53:34.858Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-02-11T16:53:34.859Z] > authorizing via signed-in user (ask5.gnr@gmail.com)
+[debug] [2025-02-11T16:53:34.859Z] [iam] checking project notes-354da for permissions ["firebase.projects.get"]
+[debug] [2025-02-11T16:53:34.859Z] Checked if tokens are valid: true, expires at: 1739295657298
+[debug] [2025-02-11T16:53:34.860Z] Checked if tokens are valid: true, expires at: 1739295657298
+[debug] [2025-02-11T16:53:34.860Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/notes-354da:testIamPermissions [none]
+[debug] [2025-02-11T16:53:34.860Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/notes-354da:testIamPermissions x-goog-quota-user=projects/notes-354da
+[debug] [2025-02-11T16:53:34.860Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/notes-354da:testIamPermissions {"permissions":["firebase.projects.get"]}
